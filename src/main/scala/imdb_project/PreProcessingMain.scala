@@ -15,7 +15,7 @@ object PreProcessingMain {
     // set up exectution
     val env = ExecutionEnvironment.getExecutionEnvironment
 
-    // create two datasets of MovieSynopsis (as training and test set)
+    // create two datasets of MovieSynopsis (as (trainingSet, testSet))
 
 
     // run execution
