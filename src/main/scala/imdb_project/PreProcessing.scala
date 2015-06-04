@@ -14,15 +14,17 @@ object PreProcessing {
   val genre_pattern = "^(?![\\s\"])(.+)\\s+\\((\\d{4})\\)\\s+([^\\(\\)][A-Za-z\\-]+)$".r // 1:title, 2:year, 3:genre
   val synopsis_pattern = "".r // 1.title, 2:year, 3:synopsis
 
-  // movie and synopsis datasets
-  var movieSet: DataSet[Movie] = _
-  var synopsisSet: DataSet[Synopsis] = _
+  // training and test set
+  var trainingSet: DataSet[MovieSynopsis] = _
+  var testSet: DataSet[MovieSynopsis] = _
 
-  def readFiles(genrePath: String, synopsisPath: String, env: ExecutionEnvironment): Unit = {
+  // fraction of movies that will be in the training set
+  val TRAINING_FRACTION = 0.7f
 
-    // read and set movie set
+  
+  // create the training and test set
+  def preProcess(genrePath: String, synopsisPath: String, env: ExecutionEnvironment): Unit = {
 
-    // read and set synopsis set
   }
 }
 
