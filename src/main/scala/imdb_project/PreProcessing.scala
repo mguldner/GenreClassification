@@ -1,6 +1,5 @@
 package imdb_project
 
-import org.apache.flink.api.scala.DataSet
 import org.apache.flink.api.scala._
 
 /**
@@ -11,7 +10,7 @@ import org.apache.flink.api.scala._
 object PreProcessing {
 
   // line delimiter for plot-summaries list
-  val synopsis_line_delim = "-------------------------------------------------------------------------------"
+  val synopsis_line_delim = "-------------------------------------------------------------------------------\n"
 
   // patterns to extract necessary information from files
   val genre_pattern =
@@ -30,7 +29,7 @@ object PreProcessing {
     (DataSet[MovieSynopsis], DataSet[MovieSynopsis]) = {
 
     // read files and transform to appropriate datasets
-    val movieSet = extractMovieInfo(env.readTextFile(genrePath))
+    val movieSet = extractMovieInfo(env.readTextFile(genrePath, "iso-8859-1"))
     val synopsisSet = extractSynopsisInfo(
       env.readFile(new CustomInputFormat("iso-8859-1", synopsis_line_delim), synopsisPath)
     )
@@ -42,6 +41,7 @@ object PreProcessing {
     // create test set by keeping 1-TRAINING_FRACTION of movies for each genre
 
     // return (trainingSet, testSet)
+    return (env.fromCollection(Seq(new MovieSynopsis("asd", 1, "asd", "ad"))), env.fromCollection(Seq(new MovieSynopsis("asd", 1, "asd", "ad"))))
   }
 
   def extractMovieInfo(lines: DataSet[String]): DataSet[Movie] = {
@@ -62,16 +62,16 @@ object PreProcessing {
     // extract the movie title and year of the synopsis
     val titleYear = synopsis_movie_pattern.findFirstMatchIn(line) match {
       case None => return Seq.empty[Synopsis] // no or invalid movie title -> empty synopsis
-      case Some(m) => (m.group(0), m.group(1)) // return tuple(title, year)
+      case Some(m) => (m.group(1), m.group(2)) // return tuple(title, year)
     }
 
     // extract text of the synopsis
     var synopsisText = ""
     synopsis_text_pattern
-      .findAllIn(line)
-      .foreach(mtch => synopsisText += " " + mtch)
+      .findAllMatchIn(line)
+      .foreach(mtch => synopsisText += " " + mtch.group(1))
 
-    Seq(new Synopsis(titleYear._1.toLowerCase.trim, titleYear._2.toInt, synopsisText))
+    Seq(new Synopsis(titleYear._1.toLowerCase.trim, titleYear._2.toInt, synopsisText.toLowerCase.trim))
   }
 }
 

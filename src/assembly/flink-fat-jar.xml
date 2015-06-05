@@ -29,7 +29,7 @@
 			<outputDirectory>/</outputDirectory>
 			<useProjectArtifact>true</useProjectArtifact>
 			<excludes>
-				<exclude>org.apache.flink:*</exclude>
+				<!--<exclude>org.apache.flink:*</exclude>!-->
 			</excludes>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 			<unpack>true</unpack>
