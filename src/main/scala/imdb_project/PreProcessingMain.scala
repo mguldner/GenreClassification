@@ -26,14 +26,22 @@ object PreProcessingMain {
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     // create two datasets of MovieSynopsis (as (trainingSet, testSet))
-    PreProcessing.extractMovieInfo(env.readTextFile(genrePath, "iso-8859-1"))
+    val movieSet = PreProcessing.extractMovieInfo(env.readTextFile(genrePath, "iso-8859-1"))
+    movieSet
       .setParallelism(1)
-      .writeAsText("file:///tmp/flink/genres.list", WriteMode.OVERWRITE)
-    PreProcessing.extractSynopsisInfo(
+      .writeAsText("file:///tmp/genreclass/genres.list", WriteMode.OVERWRITE)
+
+    val synopsisSet = PreProcessing.extractSynopsisInfo(
         env.readFile(new CustomInputFormat("iso-8859-1", PreProcessing.synopsis_line_delim), synopsisPath)
       )
+    synopsisSet
       .setParallelism(1)
-      .writeAsText("file:///tmp/flink/plot.list", WriteMode.OVERWRITE)
+      .writeAsText("file:///tmp/genreclass/plot.list", WriteMode.OVERWRITE)
+
+    PreProcessing
+      .joinSets(movieSet, synopsisSet)
+      .setParallelism(1)
+      .writeAsText("file:///tmp/genreclass/join.list", WriteMode.OVERWRITE)
 
     // run execution
     env.execute()

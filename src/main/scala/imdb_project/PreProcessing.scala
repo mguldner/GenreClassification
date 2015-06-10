@@ -35,6 +35,7 @@ object PreProcessing {
     )
 
     // join datasets in order to keep only movies that have a synopsis
+    val movieSynopsis = joinSets(movieSet, synopsisSet)
 
     // create training set by keeping TRAINING_FRACTION of movies for each genre
 
@@ -42,6 +43,16 @@ object PreProcessing {
 
     // return (trainingSet, testSet)
     return (env.fromCollection(Seq(new MovieSynopsis("asd", 1, "asd", "ad"))), env.fromCollection(Seq(new MovieSynopsis("asd", 1, "asd", "ad"))))
+  }
+
+  def joinSets(movieSet: DataSet[Movie], synopsisSet: DataSet[Synopsis]): DataSet[MovieSynopsis] = {
+
+    movieSet
+      .join(synopsisSet)
+      .where(m => (m.title, m.year)).equalTo(s => (s.title, s.year))
+      .apply(
+        (mov, syn) => MovieSynopsis(mov.title, mov.year, mov.genre, syn.synopsis)
+      )//.withForwardedFields("f0.title->f0; f0.year->f1; f0.genre->f2; f1.synopsis->f3")
   }
 
   def extractMovieInfo(lines: DataSet[String]): DataSet[Movie] = {

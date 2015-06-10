@@ -85,4 +85,38 @@ class PreProcessingTest {
     assert(parsedSynopses.contains(Synopsis("american sniper", 2014, text)))
     assert(parsedSynopses.length == 1)
   }
+
+  @Test
+  def testJoin(): Unit = {
+    val movieSet = env.fromCollection(
+      List(
+        // different genre, rest is the same
+        Movie("forrest gump", 1994, "drama"),
+        Movie("forrest gump", 1994, "comedy"),
+
+        // different years
+        Movie("harry potter", 2012, "adventure"),
+        Movie("harry potter", 2001, "fantasy"),
+
+        // not contained
+        Movie("moonstruck", 1984, "romance")
+      )
+    )
+
+    val synopsisSet = env.fromCollection(
+      List(
+        Synopsis("forrest gump", 1994, "great movie"),
+        Synopsis("harry potter", 2012, "good movie"),
+        Synopsis("harry potter", 2001, "also a good movie")
+      )
+    )
+
+    val joinSet = PreProcessing.joinSets(movieSet, synopsisSet).collect()
+
+    assert(joinSet.contains(MovieSynopsis("forrest gump", 1994, "drama", "great movie")))
+    assert(joinSet.contains(MovieSynopsis("forrest gump", 1994, "comedy", "great movie")))
+    assert(joinSet.contains(MovieSynopsis("harry potter", 2001, "fantasy", "also a good movie")))
+    assert(joinSet.contains(MovieSynopsis("harry potter", 2012, "adventure", "good movie")))
+    assert(joinSet.length == 4)
+  }
 }
